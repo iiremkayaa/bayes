@@ -127,6 +127,7 @@ def calculateProbability(joint_prob_array):
     #result_array contains all conditions can occur
     result_probability=0
     for array in result_array:
+        #complete enumeration
         result_probability+=sumOfConditions(array+joint_prob_array)
     return result_probability
     
@@ -301,8 +302,8 @@ for letter in evidence_array: #values in evidence array are also held as in the 
 print("The probability calculated from data is ", calculateFromData(query_array, evidence_array))
 dependencies={}
 createJointDistribution(query_array,evidence_array)
-# P(X,Y)=P(X|Y)*P(Y) 
-#because of finding P(X|Y), we divides P(X,Y) by P(Y)
+# Conditional probability: P(X,Y)=P(X|Y)*P(Y) 
+#because of finding P(X|Y) using conditional prob, we divides P(X,Y) by P(Y)
 # joint_prob_array holds values for P(X,Y)
 print("The probability calculated by inference is ", calculateByInference(joint_prob_array,evidence_array))
 
