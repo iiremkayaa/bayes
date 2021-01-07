@@ -36,7 +36,10 @@ def calculateFromData(query_list,evidence_list): #calculates probability from da
                         break
             if(flag2==True): #if flag2 is True, query is provided is this case
                 query_data+=1
-    return query_data/evidence_data
+    if query_data==0:
+        return 0.0;
+    else:
+        return query_data/evidence_data
     
 
 def sumOfConditions(num_list):
@@ -111,9 +114,11 @@ def calculateProbability(joint_prob_array):
     remainingList=[0,1,2,3,4,5,6] #it contains values of variables as positive
     for item in joint_prob_array: #to determine changeable varibles(can be positive and negative ), values are removed from remaining list
         if item<10:
-            remainingList.remove(item)
+            if item in remainingList:
+                remainingList.remove(item)
         else:
-            remainingList.remove(item-10)
+            if item-10 in remainingList:
+                remainingList.remove(item-10)
     all_list=[]
     for i in remainingList:
         current_list= []
@@ -134,7 +139,10 @@ def calculateProbability(joint_prob_array):
 def calculateByInference(joint_prob_array,evidence_array):
     numerator=calculateProbability(joint_prob_array) #it calculates probability for P(X,Y)
     denominator=calculateProbability(evidence_array) #it calculates probablity for P(Y)
-    return (numerator/denominator) #it return P(X|Y)
+    if numerator==0.0:
+        return 0.0
+    else:
+        return (numerator/denominator) #it return P(X|Y)
 def createJointDistribution(query_list,evidence_list): #both of X and Y values are inserted to joint_prob_array to figure out P(X,Y)
     for item in query_list:
         joint_prob_array.append(item)
@@ -279,33 +287,51 @@ p_d_ab,p_nd_ab,p_d_nab,p_d_nanb=0,0,0,0
 #P(D|A,-B), P(-D|-A,B), P(-D|-A,-B), P(-D|A,-B), 
 p_d_anb,p_nd_nab,p_nd_nanb,p_nd_anb=0,0,0,0
         
-calculateProbabilities() #calculates the probabilities that can be used for network structure
 query_input=input("Please give query variables:").upper().strip()
 evidence_input=input("Please give evidence variables:").upper().strip()
 
 
 query_array=query_input.split(" "); #query_array contains indexes of  query variables. For example A-> 0, B->1 , C->2 etc.
 evidence_array=evidence_input.split(" ") #evidence_array contains indexes of evidence variables.  For example A-> 0, B->1 , C->2 etc.
+
+error=False #checks whether input is correct or not
 joint_prob_array=[]
 for letter in query_array: 
     index=query_array.index(letter)
     if(letter[0]!="N"):
-        query_array[index]=alphabet.index(letter)
+        if letter in alphabet:
+            query_array[index]=alphabet.index(letter)
+        else:
+            error=True
     else: #if input variable is negative - for exmaple nG- , this value is held like index+10.
-        query_array[index]=10+alphabet.index(letter[1]) #For example nA->10,nB->11 etc.
+        if letter[1] in alphabet:
+            query_array[index]=10+alphabet.index(letter[1]) #For example nA->10,nB->11 etc.
+        else:
+            error=False
 for letter in evidence_array: #values in evidence array are also held as in the query_array 
-    index=evidence_array.index(letter)
-    if(letter[0]!="N"):
-        evidence_array[index]=alphabet.index(letter)
-    else:
-        evidence_array[index]=10+alphabet.index(letter[1])
-print("The probability calculated from data is ", calculateFromData(query_array, evidence_array))
-dependencies={}
-createJointDistribution(query_array,evidence_array)
-# Conditional probability: P(X,Y)=P(X|Y)*P(Y) 
-#because of finding P(X|Y) using conditional prob, we divides P(X,Y) by P(Y)
-# joint_prob_array holds values for P(X,Y)
-print("The probability calculated by inference is ", calculateByInference(joint_prob_array,evidence_array))
+        index=evidence_array.index(letter)
+        if(letter[0]!="N"):
+            if letter in alphabet:
+                evidence_array[index]=alphabet.index(letter)
+            else:
+                error=True
+        else:
+            if letter[1] in alphabet:
+                evidence_array[index]=10+alphabet.index(letter[1])
+            else:
+                error=True
+if error==True:
+    print("Enter variables correctly !")
+else:
+    dependencies={}
+    createJointDistribution(query_array,evidence_array)
+    calculateProbabilities() #calculates the probabilities that can be used for network structure
+
+    # Conditional probability: P(X,Y)=P(X|Y)*P(Y) 
+    #because of finding P(X|Y) using conditional prob, we divides P(X,Y) by P(Y)
+    # joint_prob_array holds values for P(X,Y)
+    print("\nThe probability calculated by inference is ", calculateByInference(joint_prob_array,evidence_array))
+    print("The probability calculated from data is ", calculateFromData(query_array, evidence_array))
 
 
 
