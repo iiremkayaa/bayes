@@ -287,6 +287,7 @@ p_d_ab,p_nd_ab,p_d_nab,p_d_nanb=0,0,0,0
 #P(D|A,-B), P(-D|-A,B), P(-D|-A,-B), P(-D|A,-B), 
 p_d_anb,p_nd_nab,p_nd_nanb,p_nd_anb=0,0,0,0
         
+
 query_input=input("Please give query variables:").upper().strip()
 evidence_input=input("Please give evidence variables:").upper().strip()
 
@@ -334,6 +335,6 @@ else:
     print("The probability calculated from data is ", calculateFromData(query_array, evidence_array))
 
 
-
+    
 
 
